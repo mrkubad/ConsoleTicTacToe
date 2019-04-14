@@ -14,11 +14,18 @@ namespace KolkoKrzyzyk
         static void Main(string[] args)
         {
             bool GameRunning = true;
+            int CursorX = 0, CursorY = 0;
+            string PlayerFirstName = "", PlayerSecondName = "";
 
-            var CursorX = Console.CursorLeft;
-            var CursorY = Console.CursorTop;
+            Console.WriteLine("Nazwa gracza 1: ");
+            PlayerFirstName = Console.ReadLine();
 
-            //char userInput;
+            Console.WriteLine("Nazwa gracza 2: ");
+            PlayerSecondName = Console.ReadLine();
+
+            Console.Clear();
+            Console.SetCursorPosition(0, 0);
+
 
             while (GameRunning)
             {
@@ -31,10 +38,6 @@ namespace KolkoKrzyzyk
                     var userInput = Console.ReadKey().Key;
 
                     Console.SetCursorPosition(CursorX, CursorY);
-                   
-
-
-
 
                     switch(userInput)
                     {
@@ -95,15 +98,23 @@ namespace KolkoKrzyzyk
                     }
                     
                 }
-                Console.Clear();
+                Console.CursorVisible = false;
+                Console.SetCursorPosition(0, 0);
+
 
 
                 printGrid();
 
+                if(playerId == 1)
+                    Console.WriteLine($"Tura gracza: {PlayerFirstName}");
+                else
+                    Console.WriteLine($"Tura gracza: {PlayerSecondName}");
+
                 Console.SetCursorPosition(CursorX, CursorY);
+                Console.CursorVisible = true;
 
 
-                Thread.Sleep(33);
+                Thread.Sleep(16);
                 
 
 
@@ -120,6 +131,16 @@ namespace KolkoKrzyzyk
                 Console.WriteLine($"{grid[i, 0]}|{grid[i, 1]}|{grid[i, 2]}");
 
             }
+        }
+
+        static void checkWinner(int x, int y)
+        {
+            if (x == 4)
+                x = 3;
+
+
+
+
         }
 
         static void changePlayer()
@@ -149,4 +170,4 @@ namespace KolkoKrzyzyk
             }
         }
     }
-}
+}   
