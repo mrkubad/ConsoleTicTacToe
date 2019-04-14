@@ -135,11 +135,26 @@ namespace KolkoKrzyzyk
 
         static void checkWinner(int x, int y)
         {
+            bool result = false;
+            char PlayerSign = '_';
+            if (playerId == 1)
+                PlayerSign = 'X';
+            else
+                PlayerSign = 'O';
             if (x == 4)
                 x = 3;
 
 
 
+
+            //if(grid[x-1, y] == PlayerSign && grid[x+1, y] == PlayerSign && grid[x,y +1] == PlayerSign && grid[x,y+2] == PlayerSign)
+            //{
+
+            //}
+
+
+
+            //if()
 
         }
 
