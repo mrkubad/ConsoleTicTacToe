@@ -9,25 +9,29 @@ namespace KolkoKrzyzyk
 {
     class Program
     {
-        static char[,] grid = new char[3, 3] { { '_', '_', '_' }, { '_', '_', '_' }, { '_', '_', '_' } };
         static short playerId = 1;
+        static List<char> table = Enumerable.Repeat('_', 9).ToList();
+        static string PlayerFirstName, PlayerSecondName;
         static void Main(string[] args)
         {
+            
             bool GameRunning = true;
-            int CursorX = 0, CursorY = 0;
-            string PlayerFirstName = "", PlayerSecondName = "";
+            ushort GameSets = 0;
 
-            Console.WriteLine("Nazwa gracza 1: ");
+            int CursorX = 0, CursorY = 0;
+            
+
+            Console.WriteLine("First player name: ");
             PlayerFirstName = Console.ReadLine();
 
-            Console.WriteLine("Nazwa gracza 2: ");
+            Console.WriteLine("Second player name: ");
             PlayerSecondName = Console.ReadLine();
 
             Console.Clear();
             Console.SetCursorPosition(0, 0);
 
 
-            while (GameRunning)
+            while (GameRunning && !checkWinner() && GameSets < 9 )
             {
                 if(Console.KeyAvailable)
                 {
@@ -87,6 +91,7 @@ namespace KolkoKrzyzyk
                         case ConsoleKey.S:
                             {
                                 setPlayerSign(CursorX, CursorY);
+                                GameSets++;
                                 changePlayer();
                                 break;
                             }
@@ -105,19 +110,22 @@ namespace KolkoKrzyzyk
 
                 printGrid();
 
-                if(playerId == 1)
-                    Console.WriteLine($"Tura gracza: {PlayerFirstName}");
-                else
-                    Console.WriteLine($"Tura gracza: {PlayerSecondName}");
+
+                Console.WriteLine("{0}'s turn", playerId == 1 ? PlayerFirstName : PlayerSecondName);
+
 
                 Console.SetCursorPosition(CursorX, CursorY);
                 Console.CursorVisible = true;
 
 
                 Thread.Sleep(16);
-                
 
-
+            }
+  
+            if(GameSets == 9)
+            {
+                Console.SetCursorPosition(0, 5);
+                Console.WriteLine("Draw!");
             }
 
             Console.ReadKey();
@@ -125,37 +133,94 @@ namespace KolkoKrzyzyk
 
         static void printGrid()
         {
-
-            for(int i = 0; i < 3; ++i)
+            for(int i = 0; i < table.Count; ++i)
             {
-                Console.WriteLine($"{grid[i, 0]}|{grid[i, 1]}|{grid[i, 2]}");
-
+                Console.Write(table[i]);
+                if ((i + 1) % 3 == 0)
+                {
+                    Console.WriteLine();
+                }
+                else
+                {
+                    Console.Write('|');
+                }
             }
         }
 
-        static void checkWinner(int x, int y)
+        static bool checkWinner()
         {
-            bool result = false;
-            char PlayerSign = '_';
-            if (playerId == 1)
-                PlayerSign = 'X';
-            else
-                PlayerSign = 'O';
-            if (x == 4)
-                x = 3;
+            ushort p1rowPoints, p2rowPoints, p1columnPoints, p2columnPoints, p1firstDiagonalPoints = 0, p2firstDiagonalPoints = 0,
+                p1secondDiagonalPoints = 0, p2secondDiagonalPoints = 0;
+                ;
 
+            for (int i = 0; i < 3; ++i)
+            {
+                p1rowPoints = 0;
+                p2rowPoints = 0;
+                p1columnPoints = 0;
+                p2columnPoints = 0;
 
+                for (int j = 0; j < 3; j++)
+                {
+                    // check for row win
+                    if (table[i * 3 + j] == 'X')
+                    {
+                        p1rowPoints++;
+                    }
+                    else if (table[i * 3 + j] == 'O')
+                    {
+                        p2rowPoints++;
+                    }
 
+                    // check for column win
+                    if (table[j * 3 + i] == 'X')
+                    {
+                        p1columnPoints++;
+                    }
+                    else if (table[j * 3 + i] == 'O')
+                    {
+                        p2columnPoints++;
+                    }
 
-            //if(grid[x-1, y] == PlayerSign && grid[x+1, y] == PlayerSign && grid[x,y +1] == PlayerSign && grid[x,y+2] == PlayerSign)
-            //{
+                    // check for first diagonal win
+                    if (i == j && table[j * 3 + i] == 'X')
+                    {
+                        p1firstDiagonalPoints++;
+                    }
+                    else if (i == j && table[j * 3 + i] == 'O')
+                    {
+                        p2firstDiagonalPoints++;
+                    }
+                    //check for second diagonal
+                    if(i+j == 2 && table[j * 3 + i] == 'X')
+                    {
+                        p1secondDiagonalPoints++;
+                    }
+                    else if (i + j == 2 && table[j * 3 + i] == 'O')
+                    {
+                        p2secondDiagonalPoints++;
+                    }
+                }
 
-            //}
+                if(p1columnPoints == 3 || p1rowPoints == 3 || p1firstDiagonalPoints == 3 || p1secondDiagonalPoints == 3)
+                {
+                    displayWinner(1);
+                    return true;
+                }
+                else if( p2columnPoints == 3 || p2rowPoints == 3 || p2firstDiagonalPoints == 3 || p2secondDiagonalPoints == 3)
+                {
+                    displayWinner(-1);
+                    return true;
+                }
 
+            }
+            return false;
+        }
 
-
-            //if()
-
+        static void displayWinner(int playerId)
+        {
+            Console.SetCursorPosition(0, 5);
+            Console.WriteLine("{0} wins the game! :)", playerId > 0 ? PlayerFirstName : PlayerSecondName);
         }
 
         static void changePlayer()
@@ -165,24 +230,15 @@ namespace KolkoKrzyzyk
 
         static void setPlayerSign(int x, int y)
         {
-            if(playerId == 1)
-            {
-                if (x == 4)
-                    x = 3;
-                if (grid[y, (x == 0 ? x : x - 1)] == '_')
-                {
-                    grid[y, (x == 0 ? x : x - 1)] = 'X';
-                }
-            }
-            else
-            {
-                if (x == 4)
-                    x = 3;
-                if (grid[y, (x == 0 ? x : x - 1)] == '_')
-                {
-                    grid[y, (x == 0 ? x : x - 1)] = 'O';
-                }
-            }
+            if (x == 4)
+                x = 2;
+            else if (x == 2)
+                x = 1;
+
+            int index = y * 3 + x;
+
+            if(table[index] == '_')
+                table[index] = playerId > 0 ? 'X' : 'O';
         }
     }
 }   
